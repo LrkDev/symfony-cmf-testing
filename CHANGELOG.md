@@ -1,6 +1,14 @@
 Changelog
 =========
 
+4.x
+===
+
+4.4.3
+-----
+
+* Support phpcr-bundle 3.
+
 4.4.2
 -----
 

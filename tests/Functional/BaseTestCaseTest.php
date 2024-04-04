@@ -11,6 +11,8 @@
 
 namespace Symfony\Cmf\Component\Testing\Tests\Functional;
 
+use Doctrine\Bundle\PHPCRBundle\Initializer\InitializerManager;
+use Doctrine\Bundle\PHPCRBundle\ManagerRegistryInterface;
 use Doctrine\Bundle\PHPCRBundle\Test\RepositoryManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,12 +27,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class BaseTestCaseTest extends TestCase
 {
     /**
-     * @var ContainerInterface|MockObject
+     * @var ContainerInterface&MockObject
      */
     private $container;
 
     /**
-     * @var KernelInterface|MockObject
+     * @var KernelInterface&MockObject
      */
     private $kernel;
 
@@ -47,20 +49,24 @@ class BaseTestCaseTest extends TestCase
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
+        $this->container
             ->method('get')
-            ->will($this->returnCallback(function ($name) {
-                $dic = ['test.client' => $this->client];
+            ->willReturnCallback(function ($name) {
+                $dic = [
+                    'test.client' => $this->client,
+                    'doctrine_phpcr' => $this->createMock(ManagerRegistryInterface::class),
+                    'doctrine_phpcr.initializer_manager' => $this->createMock(InitializerManager::class),
+                ];
 
                 return $dic[$name];
-            }));
+            });
 
         $this->kernel = $this->createMock(KernelInterface::class);
-        $this->kernel->expects($this->any())
+        $this->kernel
             ->method('getContainer')
             ->willReturn($this->container)
         ;
-        $this->kernel->expects($this->any())
+        $this->kernel
             ->method('getEnvironment')
             ->willReturn('phpcr')
         ;
@@ -74,7 +80,7 @@ class BaseTestCaseTest extends TestCase
             $this->client = $this->createMock(Client::class);
         }
 
-        $this->client->expects($this->any())
+        $this->client
             ->method('getContainer')
             ->willReturn($this->container);
     }
@@ -122,6 +128,7 @@ class BaseTestCaseTest extends TestCase
 
     /**
      * @dataProvider provideTestDb
+     *
      * @depends testGetContainer
      */
     public function testDb($dbName, $expected)
