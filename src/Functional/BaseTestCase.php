@@ -167,7 +167,14 @@ abstract class BaseTestCase extends WebTestCase
             ));
         }
 
-        $dbManager = new $className($this->getContainer());
+        $refl = new \ReflectionClass($className);
+        if (1 === $refl->getConstructor()->getNumberOfParameters()) {
+            // phpcr-bundle < 3
+            $dbManager = new $className(self::getContainer());
+        } else {
+            // phpcr-bundle >= 3
+            $dbManager = new $className(self::getContainer()->get('doctrine_phpcr'), self::getContainer()->get('doctrine_phpcr.initializer_manager'));
+        }
 
         $this->dbManagers[$type] = $dbManager;
 
@@ -178,10 +185,10 @@ abstract class BaseTestCase extends WebTestCase
     {
         libxml_use_internal_errors(true);
 
-        $dom = new \DomDocument();
+        $dom = new \DOMDocument();
         $dom->loadHTML($response->getContent());
 
-        $xpath = new \DOMXpath($dom);
+        $xpath = new \DOMXPath($dom);
         $result = $xpath->query('//div[contains(@class,"text-exception")]/h1');
         $exception = null;
         if ($result->length) {
