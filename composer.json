@@ -41,10 +41,5 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "4.x-dev"
-        }
     }
 }
