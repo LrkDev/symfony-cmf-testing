@@ -4,10 +4,12 @@ Changelog
 4.x
 ===
 
-4.4.3
+4.5.0
 -----
 
 * Support phpcr-bundle 3.
+* Support Symfony 7.
+* Drop support for Symfony < 5.4.
 
 4.4.2
 -----

@@ -41,16 +41,17 @@ $config = [
 ];
 
 if (class_exists(\Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider::class)) {
-    // Symfony <=5.4
+    // Symfony 5.4
     $config = array_merge($config, ['firewall' => ['main' => ['anonymous' => null]]]);
 }
 
 if (interface_exists(\Symfony\Component\PasswordHasher\PasswordHasherInterface::class)) {
     unset($config['encoders']);
-    $config = array_merge($config, [
-        'enable_authenticator_manager' => true,
-        'password_hashers' => ['Symfony\Component\Security\Core\User\User' => 'plaintext'],
-    ]);
+    $config['password_hashers'] = ['Symfony\Component\Security\Core\User\User' => 'plaintext'];
+    if (class_exists(\Symfony\Component\Security\Core\Security::class)) {
+        // Symfony 6 but not 7
+        $config['enable_authenticator_manager'] = true;
+    }
 }
 
 $container->loadFromExtension('security', $config);
