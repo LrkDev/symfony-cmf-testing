@@ -27,7 +27,8 @@
         "symfony/phpunit-bridge": "^7.0.3"
     },
     "conflict": {
-        "doctrine/phpcr-bundle": "<3.0"
+        "doctrine/phpcr-bundle": "<3.0",
+        "symfony/framework-bundle": "<5.4.6"
     },
     "autoload": {
         "psr-4": {

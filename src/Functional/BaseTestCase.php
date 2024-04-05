@@ -143,7 +143,14 @@ abstract class BaseTestCase extends WebTestCase
             ));
         }
 
-        $dbManager = new $className($this->getContainer());
+        $refl = new \ReflectionClass($className);
+        if (1 === $refl->getConstructor()->getNumberOfParameters()) {
+            // phpcr-bundle < 3
+            $dbManager = new $className(self::getContainer());
+        } else {
+            // phpcr-bundle >= 3
+            $dbManager = new $className(self::getContainer()->get('doctrine_phpcr'), self::getContainer()->get('doctrine_phpcr.initializer_manager'));
+        }
 
         $this->dbManagers[$type] = $dbManager;
 
