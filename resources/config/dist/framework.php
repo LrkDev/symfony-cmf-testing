@@ -16,11 +16,10 @@ if ($container->hasParameter('kernel.project_dir')) {
 
 $config = [
     'secret' => 'test',
-    'test' => null,
+    'test' => true,
     'form' => true,
     'validation' => [
         'enabled' => true,
-        'enable_annotations' => true,
     ],
     'router' => [
         'resource' => $routerPath,
@@ -29,14 +28,14 @@ $config = [
     'translator' => [
         'fallback' => 'en',
     ],
+    'session' => [
+        'storage_factory_id' => 'session.storage.factory.mock_file',
+    ],
 ];
 
-if (interface_exists(\Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface::class)) {
-    // Symfony 5.3+
-    $config = array_merge($config, ['session' => ['storage_factory_id' => 'session.storage.factory.mock_file']]);
-} else {
-    // Symfony <5.3
-    $config = array_merge($config, ['session' => ['storage_id' => 'session.storage.filesystem']]);
+if (class_exists(\Symfony\Component\Validator\Mapping\Loader\AnnotationLoader::class)) {
+    // Symfony < 7
+    $config['validation']['enable_annotations'] = true;
 }
 
 $container->loadFromExtension('framework', $config);

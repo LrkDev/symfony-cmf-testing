@@ -18,7 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\ORM;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\PHPCR;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\PhpcrDecorator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -80,18 +79,6 @@ abstract class BaseTestCase extends WebTestCase
         return parent::bootKernel(static::getKernelConfiguration());
     }
 
-    /**
-     * BC with Symfony < 5.3 - when minimum version raises to ^5.3, we can remove this method.
-     */
-    protected static function getContainer(): ContainerInterface
-    {
-        if (method_exists(KernelTestCase::class, 'getContainer')) {
-            return parent::getContainer();
-        }
-
-        return self::getKernel()->getContainer();
-    }
-
     protected static function getKernel(): KernelInterface
     {
         if (null === static::$kernel) {
@@ -100,9 +87,7 @@ abstract class BaseTestCase extends WebTestCase
 
         if (static::$kernel instanceof KernelInterface) {
             $kernelEnvironment = static::$kernel->getEnvironment();
-            $expectedEnvironment = isset(static::getKernelConfiguration()['environment'])
-                ? static::getKernelConfiguration()['environment']
-                : 'phpcr';
+            $expectedEnvironment = static::getKernelConfiguration()['environment'] ?? 'phpcr';
             if ($kernelEnvironment !== $expectedEnvironment) {
                 var_dump($kernelEnvironment, $expectedEnvironment);
                 static::bootKernel();

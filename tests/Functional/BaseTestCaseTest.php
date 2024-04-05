@@ -12,6 +12,7 @@
 namespace Symfony\Cmf\Component\Testing\Tests\Functional;
 
 use Doctrine\Bundle\PHPCRBundle\Initializer\InitializerManager;
+use Doctrine\Bundle\PHPCRBundle\ManagerRegistry;
 use Doctrine\Bundle\PHPCRBundle\ManagerRegistryInterface;
 use Doctrine\Bundle\PHPCRBundle\Test\RepositoryManager;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,7 +22,9 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Cmf\Component\Testing\Functional\BaseTestCase;
 use Symfony\Cmf\Component\Testing\Functional\DbManager\PHPCR;
 use Symfony\Cmf\Component\Testing\Tests\Fixtures\TestTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class BaseTestCaseTest extends TestCase
@@ -48,13 +51,18 @@ class BaseTestCaseTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $managerRegistry = interface_exists(ManagerRegistryInterface::class)
+            ? $this->createMock(ManagerRegistryInterface::class)
+            : $this->createMock(ManagerRegistry::class)
+        ;
+        $this->container = Kernel::MAJOR_VERSION >= 7 ? $this->createMock(Container::class) : $this->createMock(ContainerInterface::class);
         $this->container
             ->method('get')
-            ->willReturnCallback(function ($name) {
+            ->willReturnCallback(function ($name) use ($managerRegistry) {
                 $dic = [
                     'test.client' => $this->client,
-                    'doctrine_phpcr' => $this->createMock(ManagerRegistryInterface::class),
+                    'test.service_container' => $this->container,
+                    'doctrine_phpcr' => $managerRegistry,
                     'doctrine_phpcr.initializer_manager' => $this->createMock(InitializerManager::class),
                 ];
 
@@ -83,15 +91,6 @@ class BaseTestCaseTest extends TestCase
         $this->client
             ->method('getContainer')
             ->willReturn($this->container);
-    }
-
-    public function testGetContainer()
-    {
-        $class = new \ReflectionClass(BaseTestCase::class);
-        $method = $class->getMethod('getContainer');
-        $method->setAccessible(true);
-
-        $this->assertEquals($this->container, $method->invoke(null));
     }
 
     public function testGetKernel()
@@ -128,8 +127,6 @@ class BaseTestCaseTest extends TestCase
 
     /**
      * @dataProvider provideTestDb
-     *
-     * @depends testGetContainer
      */
     public function testDb($dbName, $expected)
     {
