@@ -13,10 +13,12 @@ namespace Symfony\Cmf\Component\Testing\Tests\Functional;
 
 use Doctrine\Bundle\PHPCRBundle\Initializer\InitializerManager;
 use Doctrine\Bundle\PHPCRBundle\ManagerRegistryInterface;
+use Doctrine\Bundle\PHPCRBundle\Test\RepositoryManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Cmf\Component\Testing\Functional\BaseTestCase;
+use Symfony\Cmf\Component\Testing\Functional\DbManager\PHPCR;
 use Symfony\Cmf\Component\Testing\Tests\Fixtures\TestTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -53,6 +55,7 @@ class BaseTestCaseTest extends TestCase
             ->willReturnCallback(function ($name) use ($managerRegistry, $initializerManager) {
                 $dic = [
                     'test.client' => $this->client,
+                    'test.service_container' => $this->container,
                     'doctrine_phpcr' => $managerRegistry,
                     'doctrine_phpcr.initializer_manager' => $initializerManager,
                 ];
@@ -74,6 +77,7 @@ class BaseTestCaseTest extends TestCase
         $this->testCase->setKernel($this->kernel);
 
         $this->client = $this->createMock(KernelBrowser::class);
+
         $this->client
             ->method('getContainer')
             ->willReturn($this->container);
@@ -83,7 +87,6 @@ class BaseTestCaseTest extends TestCase
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getKernel');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(KernelInterface::class, $method->invoke(null));
     }
@@ -92,8 +95,47 @@ class BaseTestCaseTest extends TestCase
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getFrameworkBundleClient');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(KernelBrowser::class, $method->invoke($this->testCase));
+    }
+
+    public function provideTestDb()
+    {
+        return [
+            ['PHPCR', 'PHPCR'],
+            ['Phpcr', 'PHPCR'],
+            ['ORM', 'ORM'],
+            ['foobar', null],
+        ];
+    }
+
+    /**
+     * @dataProvider provideTestDb
+     */
+    public function testDb($dbName, $expected)
+    {
+        $class = new \ReflectionClass(BaseTestCase::class);
+        $method = $class->getMethod('getDbManager');
+
+        if (null === $expected) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage($dbName.'" does not exist');
+        }
+
+        $res = $method->invoke($this->testCase, $dbName);
+        if (null === $expected) {
+            // do not do assertions if the expected exception has not been thrown.
+            return;
+        }
+
+        $className = sprintf(
+            'Symfony\Cmf\Component\Testing\Functional\DbManager\%s',
+            $expected
+        );
+        if (PHPCR::class === $className && class_exists(RepositoryManager::class)) {
+            $className = RepositoryManager::class;
+        }
+
+        $this->assertInstanceOf($className, $res);
     }
 }

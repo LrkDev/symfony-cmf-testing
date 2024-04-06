@@ -11,7 +11,7 @@
 
 $config = [
     'secret' => 'test',
-    'test' => null,
+    'test' => true,
     'form' => true,
     'validation' => [
         'enabled' => true,

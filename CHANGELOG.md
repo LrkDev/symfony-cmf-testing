@@ -4,15 +4,22 @@ Changelog
 5.x
 ===
 
-5.0.0 
+5.0.0
 -----
 
-* Support Symfony 7, drop support for Symfony < 6.4
+* Drop support for Symfony < 6.4
 * The default framework configuration no longer enables validation attributes.
-* The phpcr-odm additional namespace is expected to use attributes rather than annotations.
+* The PHPCR-ODM additional namespace is expected to use attributes rather than annotations.
 
 4.x
 ===
+
+4.5.0
+-----
+
+* Support phpcr-bundle 3.
+* Support Symfony 7.
+* Drop support for Symfony < 5.4.
 
 4.4.2
 -----

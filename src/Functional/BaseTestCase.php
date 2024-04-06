@@ -143,7 +143,7 @@ abstract class BaseTestCase extends WebTestCase
             ));
         }
 
-        $dbManager = new $className($this->getContainer());
+        $dbManager = new $className(self::getContainer());
 
         $this->dbManagers[$type] = $dbManager;
 
