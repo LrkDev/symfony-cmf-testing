@@ -9,6 +9,7 @@ Changelog
 
 * Cleanup PHP 8.1 language features.
 * Simplify configuration code.
+* Update with cleanups from symfony-cmf/testing 4.5.*.
 
 5.0.0
 -----
