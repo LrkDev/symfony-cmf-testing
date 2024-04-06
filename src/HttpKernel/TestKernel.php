@@ -179,7 +179,7 @@ abstract class TestKernel extends Kernel
     public function getLogDir(): string
     {
         return implode('/', [
-            $this->getKernelDir(),
+            $this->getProjectDir(),
             'var',
             'logs',
         ]);
@@ -190,7 +190,7 @@ abstract class TestKernel extends Kernel
      */
     protected function registerConfiguredBundles(): void
     {
-        $bundleFilePath = $this->getKernelDir().'/config/bundles.php';
+        $bundleFilePath = $this->getProjectDir().'/config/bundles.php';
         if (!file_exists($bundleFilePath)) {
             return;
         }
@@ -213,8 +213,8 @@ abstract class TestKernel extends Kernel
     protected function build(ContainerBuilder $container): void
     {
         parent::build($container);
-        if (\in_array($this->getEnvironment(), ['test', 'phpcr']) && file_exists($this->getKernelDir().'/config/public_services.php')) {
-            $services = require $this->getKernelDir().'/config/public_services.php';
+        if (\in_array($this->getEnvironment(), ['test', 'phpcr']) && file_exists($this->getProjectDir().'/config/public_services.php')) {
+            $services = require $this->getProjectDir().'/config/public_services.php';
             $container->addCompilerPass(new TestContainerPass($services), PassConfig::TYPE_OPTIMIZE);
         }
     }

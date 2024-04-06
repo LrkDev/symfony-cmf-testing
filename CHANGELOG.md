@@ -4,6 +4,11 @@ Changelog
 5.x
 ===
 
+5.0.2
+-----
+
+* Fixed regression in `TestKernel`.
+
 5.0.1
 -----
 
