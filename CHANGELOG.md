@@ -21,6 +21,13 @@ Changelog
 4.x
 ===
 
+4.5.1
+-----
+
+* Use regular fixture loader with Symfony 7 rather than the dropped `ContainerAwareLoader`.
+  For fixtures with services, instantiate the fixture and pass the instance to `PHPCR::loadFixture`
+  instead of passing the class string.
+
 4.5.0
 -----
 
