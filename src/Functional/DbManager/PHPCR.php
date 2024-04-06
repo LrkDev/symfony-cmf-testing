@@ -75,7 +75,7 @@ class PHPCR
     /**
      * @param class-string|FixtureInterface $class
      */
-    public function loadFixtureClass(Loader $loader, $class)
+    public function loadFixtureClass(Loader $loader, $class): void
     {
         if (\is_object($class)) {
             $fixture = $class;
@@ -121,7 +121,7 @@ class PHPCR
         $session->save();
     }
 
-    private function getExecutor($initialize = false): PHPCRExecutor
+    private function getExecutor(bool $initialize = false): PHPCRExecutor
     {
         static $lastInitialize = null;
 
