@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Cmf\Component\Testing\Functional\BaseTestCase;
+use Symfony\Cmf\Component\Testing\Functional\DbManager\PHPCR;
 use Symfony\Cmf\Component\Testing\Tests\Fixtures\TestTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -86,7 +87,6 @@ class BaseTestCaseTest extends TestCase
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getKernel');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(KernelInterface::class, $method->invoke(null));
     }
@@ -95,7 +95,6 @@ class BaseTestCaseTest extends TestCase
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getFrameworkBundleClient');
-        $method->setAccessible(true);
 
         $this->assertInstanceOf(KernelBrowser::class, $method->invoke($this->testCase));
     }
@@ -117,7 +116,6 @@ class BaseTestCaseTest extends TestCase
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getDbManager');
-        $method->setAccessible(true);
 
         if (null === $expected) {
             $this->expectException('InvalidArgumentException');
