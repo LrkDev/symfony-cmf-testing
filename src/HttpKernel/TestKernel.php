@@ -32,9 +32,9 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 abstract class TestKernel extends Kernel
 {
-    protected $bundleSets = [];
+    protected array $bundleSets = [];
 
-    protected $requiredBundles = [];
+    protected array $requiredBundles = [];
 
     /**
      * Register commonly needed bundle sets and then
@@ -42,7 +42,7 @@ abstract class TestKernel extends Kernel
      * concrete kernel configure itself using the abstracvt
      * configure() command.
      */
-    public function __construct($env, $debug)
+    public function __construct(string $env, bool $debug)
     {
         $defaultBundles = [
             FrameworkBundle::class,
@@ -72,7 +72,7 @@ abstract class TestKernel extends Kernel
      *    $this->addBundle(new MyBundle);
      *    $this->addBundles(array(new Bundle1, new Bundle2));
      */
-    abstract protected function configure();
+    abstract protected function configure(): void;
 
     /**
      * Register a set of bundles with the given name.
@@ -80,15 +80,17 @@ abstract class TestKernel extends Kernel
      * This method does not add the bundles to the kernel,
      * it just makes a set available.
      */
-    public function registerBundleSet($name, $bundles)
+    public function registerBundleSet(string $name, array $bundles): void
     {
         $this->bundleSets[$name] = $bundles;
     }
 
     /**
      * The bundles in the named sets will be added to the Kernel.
+     *
+     * @param string[] $names
      */
-    public function requireBundleSets(array $names)
+    public function requireBundleSets(array $names): void
     {
         foreach ($names as $name) {
             $this->requireBundleSet($name);
@@ -102,7 +104,7 @@ abstract class TestKernel extends Kernel
      * This enables us to declare pre-defined bundle sets without
      * worrying if the bundle is actually present or not.
      */
-    public function requireBundleSet($name)
+    public function requireBundleSet(string $name): void
     {
         if (!isset($this->bundleSets[$name])) {
             throw new \InvalidArgumentException(sprintf(
@@ -127,7 +129,7 @@ abstract class TestKernel extends Kernel
     /**
      * Add concrete bundles to the kernel.
      */
-    public function addBundles(array $bundles)
+    public function addBundles(array $bundles): void
     {
         foreach ($bundles as $bundle) {
             $this->addBundle($bundle);
@@ -137,7 +139,7 @@ abstract class TestKernel extends Kernel
     /**
      * Add a concrete bundle to the kernel.
      */
-    public function addBundle(BundleInterface $bundle)
+    public function addBundle(BundleInterface $bundle): void
     {
         $this->requiredBundles[] = $bundle;
     }
@@ -153,28 +155,22 @@ abstract class TestKernel extends Kernel
     }
 
     /**
-     * Returns the KernelDir of the CHILD class,
+     * Returns the project directory of the CHILD class,
      * i.e. the concrete implementation in the bundles
      * src/ directory (or wherever).
      */
-    public function getKernelDir()
-    {
-        return $this->getProjectDir();
-    }
-
     public function getProjectDir(): string
     {
         $refl = new \ReflectionClass($this);
         $fname = $refl->getFileName();
-        $kernelDir = \dirname($fname);
 
-        return $kernelDir;
+        return \dirname($fname);
     }
 
     public function getCacheDir(): string
     {
         return implode('/', [
-            $this->getKernelDir(),
+            $this->getProjectDir(),
             'var',
             'cache',
         ]);
@@ -192,7 +188,7 @@ abstract class TestKernel extends Kernel
     /**
      * Registers the bundles defined in config/bundles.php.
      */
-    protected function registerConfiguredBundles()
+    protected function registerConfiguredBundles(): void
     {
         $bundleFilePath = $this->getKernelDir().'/config/bundles.php';
         if (!file_exists($bundleFilePath)) {

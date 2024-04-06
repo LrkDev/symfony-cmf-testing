@@ -15,14 +15,14 @@ use Symfony\Cmf\Component\Testing\Unit\XmlSchemaTestCase;
 
 class XmlSchemaTestCaseTest extends XmlSchemaTestCase
 {
-    public function testAcceptsSingleDomsWithoutArray()
+    public function testAcceptsSingleDomsWithoutArray(): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML('<container><config xmlns="http://cmf.symfony.com/schema/dic/foo" required="f"/></container>');
         $this->assertSchemaAcceptsXml($dom, __DIR__.'/../Fixtures/schema/schema1.xsd');
     }
 
-    public function testNegativeAssertion()
+    public function testNegativeAssertion(): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML('<container><config xmlns="http://cmf.symfony.com/schema/dic/foo" /></container>');

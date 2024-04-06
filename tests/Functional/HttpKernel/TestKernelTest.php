@@ -9,10 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Cmf\Component\Testing\Tests\HttpKernel;
+namespace Symfony\Cmf\Component\Testing\Tests\Functional\HttpKernel;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\PHPCRBundle\DoctrinePHPCRBundle;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -22,12 +23,9 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class TestKernelTest extends TestCase
 {
-    /**
-     * @var TestKernel
-     */
-    private $kernel;
+    private TestKernel&MockObject $kernel;
 
-    private $mockBundle;
+    private BundleInterface&MockObject $mockBundle;
 
     protected function setUp(): void
     {
@@ -41,7 +39,7 @@ class TestKernelTest extends TestCase
     /**
      * @dataProvider bundleSetProvider
      */
-    public function testBundleSetRequire(array $bundleSets, array $expectedBundles)
+    public function testBundleSetRequire(array $bundleSets, array $expectedBundles): void
     {
         $this->kernel->requireBundleSets($bundleSets);
         $bundles = array_keys($this->kernel->registerBundles());
@@ -52,7 +50,7 @@ class TestKernelTest extends TestCase
         }
     }
 
-    public function bundleSetProvider()
+    public function bundleSetProvider(): array
     {
         return [
             [['default'], [FrameworkBundle::class, SecurityBundle::class, TwigBundle::class]],
@@ -61,7 +59,7 @@ class TestKernelTest extends TestCase
         ];
     }
 
-    public function testBundleAdd()
+    public function testBundleAdd(): void
     {
         $this->kernel->addBundle($this->mockBundle);
         $this->kernel->addBundle($this->mockBundle);
@@ -69,7 +67,7 @@ class TestKernelTest extends TestCase
         $this->assertCount(2, $this->kernel->registerBundles());
     }
 
-    public function testRequireInvalidBundleSet()
+    public function testRequireInvalidBundleSet(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->kernel->requireBundleSet('foobar');

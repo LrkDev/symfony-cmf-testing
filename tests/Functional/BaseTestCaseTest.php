@@ -25,25 +25,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class BaseTestCaseTest extends TestCase
 {
-    /**
-     * @var Container&MockObject
-     */
-    private $container;
-
-    /**
-     * @var KernelInterface&MockObject
-     */
-    private $kernel;
-
-    /**
-     * @var TestTestCase
-     */
-    private $testCase;
-
-    /**
-     * @var KernelBrowser&MockObject
-     */
-    private $client;
+    private Container&MockObject $container;
+    private KernelInterface&MockObject $kernel;
+    private TestTestCase $testCase;
+    private KernelBrowser&MockObject $client;
 
     protected function setUp(): void
     {
@@ -99,7 +84,7 @@ class BaseTestCaseTest extends TestCase
         $this->assertInstanceOf(KernelBrowser::class, $method->invoke($this->testCase));
     }
 
-    public function provideTestDb()
+    public function provideTestDb(): array
     {
         return [
             ['PHPCR', 'PHPCR'],
@@ -112,7 +97,7 @@ class BaseTestCaseTest extends TestCase
     /**
      * @dataProvider provideTestDb
      */
-    public function testDb($dbName, $expected)
+    public function testDb(string $dbName, string|null $expected): void
     {
         $class = new \ReflectionClass(BaseTestCase::class);
         $method = $class->getMethod('getDbManager');

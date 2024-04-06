@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class TestTestCase extends BaseTestCase
 {
-    public function setKernel(KernelInterface $kernel)
+    public function setKernel(KernelInterface $kernel): void
     {
         static::$kernel = $kernel;
     }
