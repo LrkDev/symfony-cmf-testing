@@ -13,6 +13,7 @@ namespace Symfony\Cmf\Component\Testing\Functional\DbManager;
 
 use Doctrine\Bundle\PHPCRBundle\DataFixtures\PHPCRExecutor;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\ProxyReferenceRepository;
 use Doctrine\Common\DataFixtures\Purger\PHPCRPurger;
@@ -54,30 +55,40 @@ class PHPCR
     }
 
     /**
-     * @param string[] $classNames Fixture classes to load
-     * @param bool     $initialize if the ODM repository initializers should be executed
+     * @param array<class-string|object> $classes    Fixture classes or class names to load
+     * @param bool                       $initialize Whether the ODM repository initializers should be executed
      */
-    public function loadFixtures(array $classNames, bool $initialize = false): void
+    public function loadFixtures(array $classes, bool $initialize = false): void
     {
-        $loader = new ContainerAwareLoader($this->container);
+        $loader = class_exists(ContainerAwareLoader::class)
+            ? new ContainerAwareLoader($this->container)
+            : new Loader()
+        ;
 
-        foreach ($classNames as $className) {
+        foreach ($classes as $className) {
             $this->loadFixtureClass($loader, $className);
         }
 
         $this->getExecutor($initialize)->execute($loader->getFixtures(), false);
     }
 
-    public function loadFixtureClass(Loader $loader, string $className): void
+    /**
+     * @param class-string|FixtureInterface $class
+     */
+    public function loadFixtureClass(Loader $loader, $class)
     {
-        if (!class_exists($className)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Fixture class "%s" does not exist.',
-                $className
-            ));
-        }
+        if (\is_object($class)) {
+            $fixture = $class;
+        } else {
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Fixture class "%s" does not exist.',
+                    $class
+                ));
+            }
 
-        $fixture = new $className();
+            $fixture = new $class();
+        }
 
         if ($loader->hasFixture($fixture)) {
             unset($fixture);
