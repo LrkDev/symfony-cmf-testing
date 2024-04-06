@@ -113,15 +113,12 @@ abstract class BaseTestCase extends WebTestCase
      *
      * @see self::getDbManager
      */
-    protected function db($type)
+    protected function db(string $type): PhpcrDecorator|PHPCR|ORM
     {
         return $this->getDbManager($type);
     }
 
-    /**
-     * @return ORM|PHPCR
-     */
-    protected function getDbManager(string $type)
+    protected function getDbManager(string $type): PhpcrDecorator|PHPCR|ORM
     {
         if (isset($this->dbManagers[$type])) {
             return $this->dbManagers[$type];

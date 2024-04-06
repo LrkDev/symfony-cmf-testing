@@ -16,7 +16,7 @@ use Symfony\Cmf\Component\Testing\Unit\Constraint\SchemaAcceptsXml;
 
 class SchemaAcceptsXmlTest extends TestCase
 {
-    public function testCount()
+    public function testCount(): void
     {
         $constraint = new SchemaAcceptsXml(['config1', 'config2', 'config3']);
 
@@ -31,7 +31,7 @@ class SchemaAcceptsXmlTest extends TestCase
     /**
      * @dataProvider getAssertingData
      */
-    public function testAsserting($input, $schemaFile, $result, $message = null)
+    public function testAsserting($input, $schemaFile, $result, $message = null): void
     {
         $constraint = new SchemaAcceptsXml($input);
 
@@ -47,7 +47,7 @@ class SchemaAcceptsXmlTest extends TestCase
         }
     }
 
-    public function getAssertingData()
+    public function getAssertingData(): array
     {
         $schema1 = __DIR__.'/../../Fixtures/schema/schema1.xsd';
 
@@ -68,7 +68,7 @@ class SchemaAcceptsXmlTest extends TestCase
         return $data;
     }
 
-    public function testFailsIfNoConfigElementIsAvailable()
+    public function testFailsIfNoConfigElementIsAvailable(): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML('<container></container>');

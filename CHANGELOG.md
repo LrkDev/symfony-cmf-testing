@@ -4,10 +4,17 @@ Changelog
 5.x
 ===
 
+5.0.1
+-----
+
+* Cleanup PHP 8.1 language features.
+* Simplify configuration code.
+
 5.0.0
 -----
 
 * Drop support for Symfony < 6.4
+* Drop support for PHP < 8.1
 * The default framework configuration no longer enables validation attributes.
 * The PHPCR-ODM additional namespace is expected to use attributes rather than annotations.
 
